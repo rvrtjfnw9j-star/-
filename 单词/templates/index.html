@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang='zh-CN'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1.0'>
+<title>米米学长的单词本</title>
+<link rel='stylesheet' href='/static/css/style.css'>
+</head>
+<body>
+<nav class='sidebar' id='sidebar'>
+<div class='sidebar-header'>
+<h1>米米学长的单词本</h1>
+<span class='subtitle'>智能间隔重复 · FSRS</span>
+</div>
+<ul class='nav-list'>
+<li class='nav-item active' data-tab='study'><svg viewBox='0 0 24 24' width='20' height='20'><path d='M12 3v18M4 6h16M4 18h16' stroke='currentColor' stroke-width='2' fill='none' stroke-linecap='round'/></svg><span>学习</span></li>
+<li class='nav-item' data-tab='library'><svg viewBox='0 0 24 24' width='20' height='20'><rect x='3' y='3' width='18' height='18' rx='2' stroke='currentColor' stroke-width='2' fill='none'/><line x1='9' y1='8' x2='15' y2='8' stroke='currentColor' stroke-width='2' stroke-linecap='round'/><line x1='9' y1='12' x2='15' y2='12' stroke='currentColor' stroke-width='2' stroke-linecap='round'/><line x1='9' y1='16' x2='12' y2='16' stroke='currentColor' stroke-width='2' stroke-linecap='round'/></svg><span>词库</span></li>
+<li class='nav-item' data-tab='stats'><svg viewBox='0 0 24 24' width='20' height='20'><path d='M3 20h18M6 16l4-6 4 4 6-8' stroke='currentColor' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg><span>统计</span></li>
+<li class='nav-item' data-tab='settings'><svg viewBox='0 0 24 24' width='20' height='20'><circle cx='12' cy='12' r='3' stroke='currentColor' stroke-width='2' fill='none'/><path d='M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42' stroke='currentColor' stroke-width='2' stroke-linecap='round'/></svg><span>设置</span></li>
+</ul>
+<div class='sidebar-footer'>
+<div style='display:flex;flex-direction:column;gap:4px;width:100%'>
+<button class='dark-mode-toggle' onclick='toggleDarkMode()' id='dark-toggle'><svg viewBox='0 0 24 24' width='14' height='14' fill='none'><path d='M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg><span id='dark-toggle-text'>深色模式</span></button>
+<div class='wrong-badge' id='sidebar-wrong-badge' onclick='study.setMode("wrong");document.querySelector("[data-tab=study]").click();study.startSession()'><svg viewBox='0 0 24 24' width='14' height='14'><circle cx='12' cy='12' r='10' stroke='currentColor' stroke-width='2' fill='none'/><line x1='15' y1='9' x2='9' y2='15' stroke='currentColor' stroke-width='2' stroke-linecap='round'/><line x1='9' y1='9' x2='15' y2='15' stroke='currentColor' stroke-width='2' stroke-linecap='round'/></svg><span id='wrong-count-small'>0</span></div>
+</div>
+<span class='version'>v2.5</span>
+</div>
+</nav>
+<main class='main-content' id='main-content'>
+<section class='tab-content active' id='tab-study'>
+<div class='study-top'>
+<div class='study-progress-section'><div id='progress-text'>今日进度：0 / 0</div><div class='progress-bar'><div class='progress-fill' id='progress-fill' style='width:0%'></div></div></div>
+<div class='study-badges'><span class='badge badge-warning' id='wrong-count-badge'>错题: 0</span><span class='badge' id='due-count-badge'>待复习: 0</span></div>
+</div>
+<button class='btn btn-primary' id='btn-start-study' onclick='study.startSession()' style='width:100%'>开始学习</button>
+<div class='mode-selector' id='mode-selector'>
+<button class='mode-btn active' data-mode='normal' onclick='study.setMode("normal")'>每日学习</button>
+<button class='mode-btn' data-mode='wrong' onclick='study.setMode("wrong")'>错题本</button>
+<button class='mode-btn' data-mode='all' onclick='study.setMode("all")'>全部单词</button>
+<button class='mode-btn' data-mode='learn' onclick='study.setMode("learn")'>学习单词</button>
+</div>
+<div class='card-container' id='card-container'>
+<div class='card-placeholder' id='card-placeholder'><div class='placeholder-icon'><svg viewBox='0 0 24 24' width='64' height='64'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' stroke='currentColor' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg></div><p id='placeholder-text'>点击"开始学习"按钮获取今日词卡</p></div>
+<div class='flashcard' id='flashcard' style='display:none'><div class='card-inner' id='card-inner'>
+<div class='card-front' id='card-front'><span class='card-language-badge' id='card-lang'></span><span class='card-mode-badge' id='card-mode-badge'></span><div class='card-word' id='card-word'></div><div class='card-hint'>点击卡片翻转</div></div>
+<div class='card-back' id='card-back'><div class='card-back-content'><div class='card-word-small' id='card-word-small'></div><div class='card-definition' id='card-definition'></div><div class='card-kanji' id='card-kanji'></div><div class='card-pos' id='card-pos'></div><div class='card-notes' id='card-notes'></div><div class='card-info' id='card-info'></div></div><div class='card-rating' id='card-rating'><button class='rating-btn rating-again' data-rating='1'>生疏</button><button class='rating-btn rating-hard' data-rating='2'>模糊</button><button class='rating-btn rating-good' data-rating='3'>掌握</button><button class='rating-btn rating-easy' data-rating='4'>轻松</button></div></div>
+</div></div></div>
+<div class='session-info' id='session-info' style='display:none'><span id='session-status'>学习中... (新词: 0 | 复习: 0 | 剩余: 0)</span><button class='btn btn-secondary btn-sm' id='btn-leave-session' onclick='study.endSession()'>结束本次学习</button></div>
+<div class='shortcuts-tip'>键盘快捷键：Space=翻转 · 1=生疏 2=模糊 3=掌握 4=轻松</div>
+</section>
+<section class='tab-content' id='tab-library'>
+<div class='library-header'><h2>词库管理</h2><div class='library-actions'><button class='btn btn-secondary' onclick='wordManager.showAddForm()'>+ 添加词条</button><button class='btn btn-secondary' onclick='wordManager.showSentenceImport()'>语句导入</button><button class='btn btn-secondary' onclick='wordManager.showImportForm()'>批量导入</button><button class='btn btn-secondary' onclick='wordManager.exportWords()'>导出</button></div></div>
+<div class='library-toolbar'><input type='text' class='search-input' id='search-input' placeholder='搜索单词或释义...' oninput='wordManager.searchWords()'><select class='filter-select' id='lang-filter' onchange='wordManager.searchWords()'><option value=''>全部语言</option><option value='en'>英语</option><option value='ja'>日语</option></select></div>
+<div class='sentence-import-area' id='sentence-import-area' style='display:none'><div class='import-area-header'><h3>语句导入</h3><button class='btn btn-secondary btn-sm' onclick='wordManager.hideSentenceImport()'>收起</button></div><div class='import-area-body'><div class='import-text-section'><textarea id='sentence-input' class='sentence-input' rows='4' placeholder='在此粘贴英文句子或段落...'></textarea><button class='btn btn-primary' onclick='wordManager.parseSentence()' style='margin-top:8px'>解析文本</button></div><div class='parse-result-section' id='parse-result-section' style='display:none'><div class='section-label'>解析结果 <span class='word-count-badge' id='parse-word-count'>0 个单词</span></div><div class='word-blocks-wrap' id='parsed-words-container'></div></div><div class='pending-words-section'><div class='section-label'><span>待处理词库 <span class='word-count-badge' id='pending-word-count'>0</span></span><span class='pending-actions'><button class='btn btn-sm btn-danger' onclick='wordManager.clearPendingWords()' id='clear-pending-btn' style='display:none'>清空</button></span></div><div class='word-blocks-wrap pending-drop-zone' id='pending-words-container' ondragover='wordManager.onDragOver(event)' ondrop='wordManager.onDrop(event)'><div class='pending-empty-hint' id='pending-empty-hint'>拖拽单词块到这里，点击即可添加到词库</div></div></div></div></div>
+<div class='pending-bar' id='pending-bar' style='display:none' onclick='wordManager.showPendingLibrary()'>待处理词库 <span id='pending-bar-count'>(0)</span></div>
+<div class='batch-toolbar' id='batch-toolbar' style='display:none'><span class='batch-info'>已选择 <strong id='selected-count'>0</strong> 项</span><button class='btn btn-danger btn-sm' onclick='wordManager.confirmBatchDelete()'>批量删除</button><button class='btn btn-secondary btn-sm' onclick='wordManager.clearSelection()'>取消选择</button></div>
+<div class='table-container'><table class='word-table' id='word-table'><thead><tr><th class='col-check'><input type='checkbox' id='select-all' onchange='wordManager.toggleSelectAll(this.checked)'></th><th>单词</th><th>释义</th><th>语言</th><th>词性</th><th>复习</th><th>操作</th></tr></thead><tbody id='word-table-body'><tr><td colspan='7' class='empty-row'>加载中...</td></tr></tbody></table></div>
+<div class='pagination' id='pagination'></div>
+</section>
+<section class='tab-content' id='tab-stats'><h2>学习统计</h2><div class='stats-grid' id='stats-grid'>
+<div class='stat-card'><div class='stat-value' id='stat-total'>0</div><div class='stat-label'>总词汇量</div></div>
+<div class='stat-card stat-card-warning'><div class='stat-value' id='stat-wrong-count'>0</div><div class='stat-label'>错题本</div></div>
+<div class='stat-card stat-card-error'><div class='stat-value' id='stat-error-rate'>0%</div><div class='stat-label'>总错误率</div></div>
+<div class='stat-card'><div class='stat-value' id='stat-total-reviews'>0</div><div class='stat-label'>总复习次数</div></div>
+<div class='stat-card'><div class='stat-value' id='stat-mastered'>0</div><div class='stat-label'>已掌握</div></div>
+<div class='stat-card'><div class='stat-value' id='stat-today-new'>0</div><div class='stat-label'>今日学习</div></div>
+<div class='stat-card'><div class='stat-value' id='stat-today-review'>0</div><div class='stat-label'>今日复习</div></div>
+<div class='stat-card stat-card-accuracy'><div class='stat-value' id='stat-today-accuracy'>0%</div><div class='stat-label'>今日正确率</div></div>
+<div class='stat-card'><div class='stat-value' id='stat-due-today'>0</div><div class='stat-label'>待复习</div></div>
+</div>
+<div class='lang-dist'><h3>语言分布</h3><div id='lang-bars'></div></div>
+</section>
+<section class='tab-content' id='tab-settings'><h2>设置</h2><div class='settings-form'><div class='setting-item'><label for='daily-new-input'>每日学习新词数</label><div class='setting-control'><input type='number' id='daily-new-input' class='setting-input' min='1' max='100' value='20'><button class='btn btn-primary' onclick='study.saveSettings()'>保存</button></div></div></div></section>
+</main>
+<div class='modal-overlay' id='modal-overlay' style='display:none' onclick='closeModal(event)'><div class='modal' id='modal'><div class='modal-header'><h3 id='modal-title'>标题</h3><button class='modal-close' onclick='closeModal()'>&times;</button></div><div class='modal-body' id='modal-body'></div></div></div>
+<div class='modal-overlay' id='pending-modal-overlay' style='display:none' onclick='closePendingModal(event)'><div class='modal pending-modal-custom' id='pending-modal'><div class='modal-header'><h3>待处理词库</h3><button class='modal-close' onclick='closePendingModal()'>&times;</button></div><div class='modal-body'><div class='section-label' style='margin-bottom:12px'>点击单词块即可添加到词库</div><div class='word-blocks-wrap' id='pending-modal-words-container'></div><div class='form-actions' style='margin-top:16px'><button class='btn btn-secondary' onclick='closePendingModal()'>关闭</button><button class='btn btn-danger' onclick='wordManager.clearAllPendingWords()'>清空待处理</button></div></div></div></div>
+<script src='/static/js/app.js'></script>
+<script src='/static/js/app-extras.js'></script>
+<script src='/static/js/wordManager.js'></script>
+<script src='/static/js/study.js'></script>
+<script src='/static/js/stats.js'></script>
+</body>
+</html>
